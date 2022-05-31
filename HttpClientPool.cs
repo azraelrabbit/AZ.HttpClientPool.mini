@@ -26,7 +26,10 @@ namespace AZHttpClientPool
 
         private Uri _baseUri;
 
-        public HttpClientPool(string baseUrl, int poolSize = 5, bool keepAlive = false)
+        private HttpClientHandler _httpClientHandler = new MyHttpClienHanlder()
+            { UseProxy = false, UseCookies = false, AllowAutoRedirect = true };
+
+        public HttpClientPool(string baseUrl, int poolSize = 5,HttpClientHandler clientHandler=null, bool keepAlive = false)
         {
             _baseUrl = baseUrl;
 
@@ -41,6 +44,11 @@ namespace AZHttpClientPool
             }
 
             var baseUri = new Uri(_baseUrl);
+
+            if (clientHandler != null)
+            {
+                _httpClientHandler=clientHandler;
+            }
 
             GrantPool(poolSize);
         }
@@ -79,7 +87,7 @@ namespace AZHttpClientPool
                 for (var i = 0; i < toSize; i++)
                 {
 
-                    var newclient = new MyHttpClient(new MyHttpClienHanlder() { UseProxy = false, UseCookies = false, AllowAutoRedirect = true }, true);
+                    var newclient = new MyHttpClient(_httpClientHandler, true);
                     CacheControlHeaderValue cacheControl = new CacheControlHeaderValue();
                     cacheControl.NoCache = true;
                     cacheControl.NoStore = true;

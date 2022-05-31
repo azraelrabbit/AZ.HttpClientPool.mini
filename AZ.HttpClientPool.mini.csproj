@@ -11,11 +11,11 @@
 
 		<PropertyGroup>
 
-			<VersionSuffix>1.$([System.DateTime]::UtcNow.ToString(yy)).$([System.DateTime]::UtcNow.ToString(MMdd)).$([System.DateTime]::UtcNow.ToString(HHmm))</VersionSuffix>
+			<VersionSuffix>$([System.DateTime]::UtcNow.ToString(yy)).$([System.DateTime]::UtcNow.ToString(MMdd)).$([System.DateTime]::UtcNow.ToString(HHmm))</VersionSuffix>
 			<AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</AssemblyVersion>
-			<AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
+			<AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">2.$(VersionSuffix)</AssemblyVersion>
 			<Version Condition=" '$(VersionSuffix)' == '' ">0.0.1.0</Version>
-			<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>
+			<Version Condition=" '$(VersionSuffix)' != '' ">2.$(VersionSuffix)</Version>
 			<PackageProjectUrl>https://github.com/azraelrabbit/AZ.HttpClientPool.mini</PackageProjectUrl>
 			<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 

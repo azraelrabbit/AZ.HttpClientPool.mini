@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -7,6 +8,31 @@ namespace AZHttpClientPool
 {
     public class MyHttpClienHanlder : HttpClientHandler
     {
+
+        public MyHttpClienHanlder(bool ignoreCertValidation=false):base()
+        {
+            if (!ignoreCertValidation)
+            {
+                this.ClientCertificateOptions = ClientCertificateOption.Manual;
+
+#if NET40 ||NET45 ||NET45_OR_GREATER
+                ServicePointManager.ServerCertificateValidationCallback+= (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+
+                };
+
+#else
+                this.ServerCertificateCustomValidationCallback += (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+
+                };
+            
+#endif
+            }
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             //Console.WriteLine("max conn per server"+this.MaxConnectionsPerServer);
@@ -35,9 +61,13 @@ namespace AZHttpClientPool
             {
                 contentType.CharSet = "GBK";
             }
+
+            
             return response;
             //return response;
         }
+
+        
 
         private async Task<string> getCharSetAsync(HttpContent httpContent)
         {

@@ -26,10 +26,10 @@ namespace AZHttpClientPool
 
         private Uri _baseUri;
 
-        private HttpClientHandler _httpClientHandler = new MyHttpClienHanlder()
-            { UseProxy = false, UseCookies = false, AllowAutoRedirect = true };
+        private HttpClientHandler _httpClientHandler;
 
-        public HttpClientPool(string baseUrl, int poolSize = 5,HttpClientHandler clientHandler=null, bool keepAlive = false)
+
+        public HttpClientPool(string baseUrl, int poolSize = 5, string defaultCharset = "UTF-8", HttpClientHandler clientHandler =null, bool keepAlive = false)
         {
             _baseUrl = baseUrl;
 
@@ -37,13 +37,15 @@ namespace AZHttpClientPool
 
             _keepAlive = keepAlive;
 
-            
+            _httpClientHandler = new MyHttpClienHanlder(defaultCharset: defaultCharset)
+            { UseProxy = false, UseCookies = false, AllowAutoRedirect = true, AutomaticDecompression = DecompressionMethods.GZip };
+
             if (!_baseUrl.EndsWith("/"))
             {
                 _baseUrl += "/";
             }
 
-            var baseUri = new Uri(_baseUrl);
+            _baseUri = new Uri(_baseUrl);
 
             if (clientHandler != null)
             {
@@ -101,14 +103,37 @@ namespace AZHttpClientPool
                     if (!string.IsNullOrEmpty(_baseUrl))
                     {
                         //帮HttpClient热身
-                        newclient.SendAsync(new HttpRequestMessage
-                        {
-                            Method = new HttpMethod("HEAD"),
-                            RequestUri = _baseUri
-                        }).Result.EnsureSuccessStatusCode();
-                    }
+                        //newclient.SendAsync(new HttpRequestMessage
+                        //{
+                        //    Method = new HttpMethod("HEAD"),
+                        //    RequestUri = _baseUri
+                        //}).Result.EnsureSuccessStatusCode();
 
-                    _httpClientPool.Add(newclient);
+#if NET45_OR_GREATER || NETSTANDARD1_0_OR_GREATER
+
+                        Task.Run(async () => {
+
+                            await newclient.SendAsync(new HttpRequestMessage
+                            {
+                                Method = new HttpMethod("HEAD"),
+                                RequestUri = _baseUri
+                            });
+                        });
+                    
+#else
+                        TaskEx.Run(async () => {
+
+                            await newclient.SendAsync(new HttpRequestMessage
+                            {
+                                Method = new HttpMethod("HEAD"),
+                                RequestUri = _baseUri
+                            });
+                        });
+
+#endif
+                        _httpClientPool.Add(newclient);
+
+                    }
                 }
             }
             else

@@ -2,7 +2,7 @@
 
  
 		<PropertyGroup>
-			<TargetFrameworks>netstandard2.0;net45;net40</TargetFrameworks>
+			<TargetFrameworks>netstandard2.0;net45;net40;net472;</TargetFrameworks>
 			<Company>azraelrabbit</Company>
 			<Description>httpclient pool wrapper for http client </Description>
 			<Copyright>azraelrabbit</Copyright>
@@ -50,6 +50,11 @@
 		<PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
 			<DefineConstants>NET45;NETFULL</DefineConstants>
 		</PropertyGroup>
+
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+	</ItemGroup>
 
 		<!-- .NET 4.0 references, compilation flags and build options -->
 		<ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">

@@ -9,8 +9,16 @@ namespace AZHttpClientPool
     public class MyHttpClienHanlder : HttpClientHandler
     {
 
-        public MyHttpClienHanlder(bool ignoreCertValidation=false):base()
+        string DefaultCharSet = "UTF-8";
+
+        public MyHttpClienHanlder(string defaultCharset = "UTF-8", bool ignoreCertValidation = false) : base()
         {
+            if (!string.IsNullOrEmpty(defaultCharset))
+            {
+                DefaultCharSet = defaultCharset;
+            }
+
+
             if (!ignoreCertValidation)
             {
                 this.ClientCertificateOptions = ClientCertificateOption.Manual;
@@ -40,18 +48,7 @@ namespace AZHttpClientPool
 
             //request.Headers.Add("UserAgent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727)");
             request.Headers.Add("UserAgent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-
-
-            //Task<HttpResponseMessage> task = base.SendAsync(request, cancellationToken);
-            //HttpResponseMessage response = task.Result;
-            //MediaTypeHeaderValue contentType = response.Content.Headers.ContentType;
-            //if (string.IsNullOrEmpty(contentType.CharSet))
-            //{
-            //    contentType.CharSet = "GBK";
-            //}
-
-            //return task;
-
+ 
 
             var response = await base.SendAsync(request, cancellationToken);
 
@@ -59,12 +56,12 @@ namespace AZHttpClientPool
             //contentType.CharSet = await getCharSetAsync(response.Content);
             if (string.IsNullOrEmpty(contentType.CharSet))
             {
-                contentType.CharSet = "GBK";
+                contentType.CharSet = DefaultCharSet;// "GBK";
             }
 
             
             return response;
-            //return response;
+ 
         }
 
         
